@@ -21,13 +21,10 @@ session_factory: async_scoped_session = async_scoped_session(
 
 async def get_async_session():
     async with session_factory() as session:
-        session_id = str(uuid.uuid4())
-        session.bind = async_engine.execution_options(
-            stream_results=True
-        ).params(session_id=session_id)
-        yield session
+        try:
+            yield session
+        finally:
+            await session.close()
 
 
 Base = declarative_base()
-
-Base.metadata.create_all(async_engine)
