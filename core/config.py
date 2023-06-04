@@ -1,6 +1,6 @@
 import os
 
-from pydantic import BaseSettings
+from pydantic import BaseSettings, PostgresDsn
 
 
 class Config(BaseSettings):
@@ -8,10 +8,7 @@ class Config(BaseSettings):
     #                      f"{os.getenv('POSTGRES_PASSWORD')}@" \
     #                      f"{os.getenv('POSTGRES_HOST')}:" \
     #                      f"{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
-    DB_URL: str = f"postgresql+asyncpg://postgres:" \
-                         f"postgres@" \
-                         f"localhost:" \
-                         f"5432/course"
+    DB_URL: PostgresDsn
     JWT_SECRET_KEY: str = f"{os.getenv('JWT_SECRET_KEY')}"
     JWT_ALGORITHM: str = f"{os.getenv('JWT_ALGORITHM')}"
 

@@ -8,7 +8,6 @@ from core.config import config
 
 async_engine = create_async_engine(
     config.DB_URL,
-    echo=True,
     pool_recycle=3600
 )
 
