@@ -1,8 +1,9 @@
 import uuid
 from asyncio import current_task
+from typing import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, async_scoped_session
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 from core.config import config
 
@@ -12,18 +13,11 @@ async_engine = create_async_engine(
 )
 
 
-async_sesison_factory = async_sessionmaker(async_engine)
+async_sesison_factory = sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)
 
-session_factory: async_scoped_session = async_scoped_session(
-    async_sesison_factory, scopefunc=current_task
-)
-
-async def get_async_session():
-    async with session_factory() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_sesison_factory() as session:
+        yield session
 
 
 Base = declarative_base()

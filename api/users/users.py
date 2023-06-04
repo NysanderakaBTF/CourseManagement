@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Body
 
 from app.users.service.users import UserService
 from app.users.schemas.schemas import *
@@ -12,8 +14,8 @@ async def get_user(user_id: int):
 
 
 @user_router.post("/users", response_model=UserCreateResponceSchema)
-async def create_user(user: UserCreateRequestSchema):
-    return await UserService.create_user(user)
+async def create_user(user: Annotated[UserCreateRequestSchema, Body()]):
+    return await UserService.create_user(user=user)
 
 @user_router.post("/login")
 async def login(username: str, password: str):

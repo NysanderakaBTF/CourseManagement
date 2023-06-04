@@ -28,7 +28,7 @@ class Section(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String, default='No description')
-    course_id = Column(BigInteger, ForeignKey('course.id'), nullable=False)
+    course_id = Column(BigInteger, ForeignKey('courses.id'), nullable=False)
 
     blocks = relationship('Block', back_populates='section')
     course = relationship('Course', back_populates='sections')

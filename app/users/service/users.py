@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException
 from sqlalchemy import select, or_
-from sqlalchemy.ext.asyncio import async_scoped_session
+from sqlalchemy.ext.asyncio import async_session, AsyncSession
 
 from app.users.models.user import User
 from core.db.db_config import get_async_session
@@ -15,25 +15,25 @@ from core.utils.token import TokenHelper
 class UserService:
     def __init__(self):
         pass
-
-    async def get_all_users(self,
-                            session=Annotated[async_scoped_session, Depends(get_async_session)],
+    @staticmethod
+    async def get_all_users(session=Annotated[AsyncSession, Depends(get_async_session)],
                             limit: int = 10,
                             offset: int = 0
                             ):
         result = await session.execute(select(User).limit(limit).offset(offset).all())
         return result.scalars().all()
 
-    async def get_user(self,
-                       user_id,
-                       session=Annotated[async_scoped_session, Depends(get_async_session)]):
+    @staticmethod
+    async def get_user(user_id,
+                       session=Annotated[AsyncSession, Depends(get_async_session)]):
         result = await session.execute(select(User).where(User.id == user_id))
         user = result.scalar()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         return user
 
-    async def create_user(self, user: UserCreateRequestSchema, session=Annotated[async_scoped_session, Depends(get_async_session)]):
+    @staticmethod
+    async def create_user(user: UserCreateRequestSchema, session=Annotated[AsyncSession, Depends(get_async_session)]):
         if user.password1 != user.password2:
             raise HTTPException(status_code=400, detail="Passwords don't match")
         exists = await session.execute(select(User).where(or_(User.email == user.email, User.username == user.username)).exists())
@@ -49,16 +49,18 @@ class UserService:
         await session.refresh(user)
         return user
 
-    async def update_user(self, user):
+    @staticmethod
+    async def update_user(user):
         pass
 
-    async def delete_user(self, user_id):
+    @staticmethod
+    async def delete_user(user_id):
         pass
 
-    async def authenticate_user(self,
-                                username: str,
+    @staticmethod
+    async def authenticate_user(username: str,
                                 password: str,
-                                session=Annotated[async_scoped_session, Depends(get_async_session)]):
+                                session=Annotated[AsyncSession, Depends(get_async_session)]):
         res = await session.execute(select(User).where(User.username == username))
         user = res.scalar()
         if not user:
