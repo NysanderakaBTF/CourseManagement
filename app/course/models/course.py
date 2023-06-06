@@ -30,7 +30,7 @@ class Section(Base):
     description = Column(String, default='No description')
     course_id = Column(BigInteger, ForeignKey('courses.id'), nullable=False)
 
-    blocks = relationship('Block', back_populates='section')
+    blocks = relationship('Block', back_populates='section', cascade='all, delete')
     course = relationship('Course', back_populates='sections')
 
 
@@ -44,8 +44,8 @@ class Course(Base, TimestampMixin):
     date_start = Column(TIMESTAMP(timezone=True))
     date_end = Column(TIMESTAMP(timezone=True))
 
-    sections = relationship('Section', back_populates='course')
-    user = relationship(User, back_populates='courses')
+    sections = relationship('Section', back_populates='course', cascade='all, delete')
+    user = relationship(User, back_populates='teacher_in')
 
     participants = relationship('StudentCourse', back_populates='course')
 

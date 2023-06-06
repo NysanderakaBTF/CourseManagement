@@ -17,6 +17,9 @@ class User(Base, TimestampMixin):
     role = Column(Enum(Role), index=True, nullable=False)
 
     courses = relationship("StudentCourse", back_populates="student")
+
+    teacher_in = relationship("Course", back_populates="user")
+
     student_content_blocks = relationship(
         "CompletedContentBlock", back_populates="student"
     )

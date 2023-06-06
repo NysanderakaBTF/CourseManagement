@@ -14,7 +14,7 @@ class JWTTokenService:
         refresh_token = TokenHelper.decode(token=refresh_token)
         if refresh_token.get("sub") != "refresh":
             raise JWTError("Invalid refresh token")
-
+        #TODO: get expiresion time from env
         return JWTTokenSchema(
             token=TokenHelper.encode(payload={"user_id": token.get("user_id")}),
             refresh_token=TokenHelper.encode(payload={"sub": "refresh"}),

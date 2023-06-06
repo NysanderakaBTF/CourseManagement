@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import Field, BaseModel
 
-from app.course.schemas.section import RetriveCourseSectionResponseSchema
+from app.course.schemas.section import RetriveCourseSectionResponseSchema, CreateCourseSectionResposeSchema
 from app.users.schemas.schemas import UserCreateResponceSchema
 
 
@@ -27,15 +27,21 @@ class CreateCourseResponseSchema(BaseModel):
         orm_mode = True
 
 
-class RetriveCourseResponseSchema(BaseModel):
+class RetriveCourseListResponseSchema(BaseModel):
     id: int = Field(..., description="Id")
     title: str = Field(..., description="Course Schema")
     description: str = Field(description="Course description")
     user: UserCreateResponceSchema = Field(..., description="Course organizer user id")
     date_start: datetime = Field(..., description="Course start date")
     date_end: datetime = Field(..., description="Course end date")
+
+    class Config:
+        orm_mode = True
+
+
+class RetriveCourseResponseSchema(RetriveCourseListResponseSchema):
     participants: List[UserCreateResponceSchema]
-    sections: List[RetriveCourseSectionResponseSchema]
+    sections: List[CreateCourseSectionResposeSchema]
 
     class Config:
         orm_mode = True
@@ -57,4 +63,3 @@ class RetriveFinishedCourseResponseSchema(BaseModel):
 
     class Config:
         orm_mode = True
-
