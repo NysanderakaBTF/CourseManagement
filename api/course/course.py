@@ -12,7 +12,7 @@ from app.users.models import User
 from core.db import get_async_session
 from core.dependencies.current_user import get_current_user
 
-course_router = APIRouter()
+course_router = APIRouter(tags=["course"])
 
 
 @course_router.get("/courses",
@@ -45,10 +45,36 @@ async def create_course(course: CreateCourseRequestSchema,
 
 
 @course_router.put("/courses/{course_id}/add_participant",
-                   response_model=RetriveCourseResponseSchema,
                    summary="Add participant to course",
-                   description="Add participant to course")
+                   description="Add participant to course",
+                   response_model=RetriveCourseResponseSchema)
 async def add_participant_to_course(course_id: int,
                                     current_user: User = Depends(get_current_user),
                                     ):
-    return CourseService.add_participant_to_course(course_id=course_id, user=current_user)
+    return await CourseService.add_participant_to_course(course_id=course_id, user=current_user)
+
+@course_router.put("/courses/{course_id}/remove_participant",
+                   summary="Add participant to course",
+                   description="Add participant to course",
+                   response_model=RetriveCourseResponseSchema)
+async def add_participant_to_course(course_id: int,
+                                    current_user: User = Depends(get_current_user),
+                                    ):
+    return await CourseService.remove_participant_from_course(course_id=course_id, user=current_user)
+
+
+@course_router.put("/courses/{course_id}",
+                   summary="Update course info",
+                   description="Update course info",
+                   response_model=RetriveCourseResponseSchema)
+async def update_course_info(course_id: int, course: CreateCourseRequestSchema,
+                             current_user: User = Depends(get_current_user)):
+    return await CourseService.update_course(course_id=course_id, user = current_user,
+                                             **course.dict())
+
+@course_router.delete("/courses/{course_id}",
+                      summary="Delete course",
+                      description="Delete course")
+async def delete_course(course_id: int,
+                        current_user: User = Depends(get_current_user)):
+    await CourseService.delete_course(course_id=course_id,  user=current_user)

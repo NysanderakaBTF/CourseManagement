@@ -22,10 +22,10 @@ class CreateCourseSectionResposeSchema(BaseModel):
 
 
 class RetriveCourseSectionResponseSchema(BaseModel):
-    id: int = Field(..., description="Id")
-    title: str = Field(..., description="Course part name")
+    id: int = Field(description="Id")
+    title: str = Field(description="Course part name")
     description: str = Field(description="Course description")
-    blocks: List[RetriveCourseBlockResponseSchema]
+    blocks: List[RetriveCourseBlockResponseSchema] = []
 
 
     class Config:

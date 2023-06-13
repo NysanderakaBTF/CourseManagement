@@ -1,10 +1,10 @@
 from sqlalchemy import Column, BigInteger, String, Boolean, Enum
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from app.users.models.enums.roles import Role
 from core.db.db_config import Base
 from core.db.mixins.timestamp import TimestampMixin
-
 
 
 class User(Base, TimestampMixin):
@@ -16,10 +16,12 @@ class User(Base, TimestampMixin):
     is_admin = Column(Boolean, default=False)
     role = Column(Enum(Role), index=True, nullable=False)
 
-    courses = relationship("StudentCourse", back_populates="student")
+    courses_assosiation = relationship("StudentCourseAssosiation", back_populates="student", cascade="all, delete")
+    courses = relationship("Course", back_populates="participants", secondary="student_course")
 
     teacher_in = relationship("Course", back_populates="user")
 
     student_content_blocks = relationship(
-        "CompletedContentBlock", back_populates="student"
+        "CompletedContentBlock", back_populates="student",
+        cascade="all, delete"
     )

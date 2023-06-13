@@ -26,8 +26,10 @@ async def provide_session():
         try:
             yield session
             await session.commit()
+            await session.close()
         except:
             await session.rollback()
+            raise
 
 
 Base = declarative_base()

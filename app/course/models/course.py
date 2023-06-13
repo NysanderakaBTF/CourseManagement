@@ -1,4 +1,5 @@
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, ForeignKey, Table, UniqueConstraint
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.sql.sqltypes import *
 from sqlalchemy.orm import relationship
 
@@ -16,11 +17,12 @@ class Block(Base):
     type = Column(Enum(ContentType))
     description = Column(String, default='No description')
 
-    section_id = Column(BigInteger, ForeignKey('section.id'), nullable=False)
+    section_id = Column(BigInteger, ForeignKey('section.id', ondelete="CASCADE"), nullable=False)
 
     section = relationship('Section', back_populates='blocks')
 
-    completed_content_blocks = relationship('CompletedContentBlock', back_populates='content_block')
+    completed_content_blocks = relationship('CompletedContentBlock', back_populates='content_block',
+                                            cascade='all, delete')
 
 
 class Section(Base):
@@ -28,10 +30,23 @@ class Section(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String, default='No description')
-    course_id = Column(BigInteger, ForeignKey('courses.id'), nullable=False)
+    course_id = Column(BigInteger, ForeignKey('courses.id', ondelete="CASCADE"), nullable=False)
 
     blocks = relationship('Block', back_populates='section', cascade='all, delete')
     course = relationship('Course', back_populates='sections')
+
+
+class StudentCourseAssosiation(TimestampMixin, Base):
+    __tablename__ = "student_course"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    student_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    course_id = Column(BigInteger, ForeignKey("courses.id", ondelete="CASCADE"), nullable=False)
+
+    completed = Column(Boolean, default=False)
+
+    student = relationship("User", back_populates="courses_assosiation")
+    course = relationship("Course", back_populates="participants_assosiation")
 
 
 class Course(Base, TimestampMixin):
@@ -40,35 +55,26 @@ class Course(Base, TimestampMixin):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False, default='No description')
-    user_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
+    user_id = Column(BigInteger, ForeignKey('users.id'), nullable=True)
     date_start = Column(TIMESTAMP(timezone=True))
     date_end = Column(TIMESTAMP(timezone=True))
 
     sections = relationship('Section', back_populates='course', cascade='all, delete')
     user = relationship(User, back_populates='teacher_in')
 
-    participants = relationship('StudentCourse', back_populates='course')
-
-
-class StudentCourse(TimestampMixin, Base):
-    __tablename__ = "student_courses"
-
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
-    completed = Column(Boolean, default=False)
-
-    student = relationship(User, back_populates="courses")
-    course = relationship(Course, back_populates="participants")
+    participants_assosiation = relationship(StudentCourseAssosiation, back_populates='course', cascade='all, delete')
+    participants = relationship("User", back_populates="courses", secondary="student_course")
 
 
 class CompletedContentBlock(TimestampMixin, Base):
     __tablename__ = "completed_content_blocks"
 
+    __table_args__ = (UniqueConstraint('student_id', 'content_block_id', name="student_block_association"),)
+
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     content_block_id = Column(
-        Integer, ForeignKey("blocks.id"), nullable=False
+        Integer, ForeignKey("blocks.id", ondelete="CASCADE"), nullable=False
     )
     feedback = Column(Text, nullable=True)
     grade = Column(Integer, default=0)

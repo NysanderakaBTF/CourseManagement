@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import Field, BaseModel
 
@@ -10,7 +10,7 @@ from app.users.schemas.schemas import UserCreateResponceSchema
 class CreateCourseRequestSchema(BaseModel):
     title: str = Field(..., description="Course Schema")
     description: str = Field(description="Course description")
-    user_id: int = Field(..., description="Course organizer user id")
+    user_id: Optional[int] = Field(None, description="Course organizer user id")
     date_start: datetime = Field(..., description="Course start date")
     date_end: datetime = Field(..., description="Course end date")
 
