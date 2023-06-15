@@ -1,12 +1,12 @@
-import datetime
+from datetime import datetime, timedelta
 from typing import List
 
 from fastapi import HTTPException
 from sqlalchemy import select, and_
-from sqlalchemy.orm import selectinload, load_only, subqueryload, joinedload
+from sqlalchemy.orm import selectinload,  joinedload
 
-from app.course.models.course import Course, StudentCourseAssosiation, Section
-from app.users.models import Role, User
+from app.course.models.course import Course, Section
+from app.users.models import Role
 from core.db.db_config import provide_session
 
 
@@ -129,8 +129,8 @@ class CourseService:
 
     @classmethod
     async def get_new_courses(cls, days):
-        start_date = datetime.datetime.utcnow() - datetime.timedelta(days=days)
-        end_date = datetime.datetime.utcnow()
+        start_date = datetime.now() - timedelta(days=days)
+        end_date = datetime.now()
 
         stmt = select(Course).where(
             and_(
@@ -144,8 +144,8 @@ class CourseService:
 
     @classmethod
     async def get_updated_courses(cls, days):
-        start_date = datetime.datetime.utcnow() - datetime.timedelta(days=days)
-        end_date = datetime.datetime.utcnow()
+        start_date = datetime.now() - timedelta(days=days)
+        end_date = datetime.now()
 
         stmt = select(Course).where(
             and_(
