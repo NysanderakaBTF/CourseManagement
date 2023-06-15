@@ -60,8 +60,6 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq/
     env_file:
       - ./.env
-    depends_on:
-      - backend
     networks:
       - backend
     restart: always
