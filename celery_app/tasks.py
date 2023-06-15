@@ -12,7 +12,7 @@ def send_new_courses():
     users = asyncio.run(UserService.get_all_users())
     print("!!!!!!!!!!!!!!!!!!!!!!")
 
-    asyncio.run(await EmailService.send_email(
+    asyncio.run(EmailService.send_email(
         [user.email for user in users],
         'New Courses',
         courses
