@@ -1,7 +1,8 @@
+import datetime
 from typing import List
 
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload, load_only, subqueryload, joinedload
 
 from app.course.models.course import Course, StudentCourseAssosiation, Section
@@ -125,3 +126,33 @@ class CourseService:
                 raise HTTPException(status_code=403, detail="You are not allowed to delete this course")
             await session.delete(course)
             await session.commit()
+
+    @classmethod
+    async def get_new_courses(cls, days):
+        start_date = datetime.utcnow() - datetime.timedelta(days=days)
+        end_date = datetime.utcnow()
+
+        stmt = select(Course).where(
+            and_(
+                Course.created_at >= start_date,
+                Course.created_at <= end_date
+            )
+        )
+        async with provide_session() as session:
+            result = await session.execute(stmt)
+            return result.scalars().all()
+
+    @classmethod
+    async def get_updated_courses(cls, days):
+        start_date = datetime.utcnow() - datetime.timedelta(days=days)
+        end_date = datetime.utcnow()
+
+        stmt = select(Course).where(
+            and_(
+                Course.updated_at >= start_date,
+                Course.updated_at <= end_date
+            )
+        )
+        async with provide_session() as session:
+            result = await session.execute(stmt)
+            return result.scalars().all()
