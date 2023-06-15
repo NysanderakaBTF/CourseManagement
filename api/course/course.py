@@ -11,6 +11,9 @@ from app.course.service.section import CourseSectionService
 from app.users.models import User
 from core.db import get_async_session
 from core.dependencies.current_user import get_current_user
+from core.dependencies.permissions.perm_classes.IsAuthenticated import IsAuthenticated
+from core.dependencies.permissions.perm_classes.IsTeacher import IsTeacher
+from core.dependencies.permissions.perm_dependency import PermisssionChecker
 
 course_router = APIRouter(tags=["course"])
 
@@ -37,7 +40,9 @@ async def get_course_by_id(course_id: int,
 @course_router.post("/courses",
                     response_model=CreateCourseResponseSchema,
                     summary="Create course",
-                    description="Create course")
+                    description="Create course",
+                    dependencies=[Depends(PermisssionChecker([IsAuthenticated,
+                                                              IsTeacher]))])
 async def create_course(course: CreateCourseRequestSchema,
                         current_user: User = Depends(get_current_user),
                         ):
@@ -47,7 +52,8 @@ async def create_course(course: CreateCourseRequestSchema,
 @course_router.put("/courses/{course_id}/add_participant",
                    summary="Add participant to course",
                    description="Add participant to course",
-                   response_model=RetriveCourseResponseSchema)
+                   response_model=RetriveCourseResponseSchema,
+                   dependencies=[Depends(PermisssionChecker([IsAuthenticated]))])
 async def add_participant_to_course(course_id: int,
                                     current_user: User = Depends(get_current_user),
                                     ):
@@ -56,8 +62,11 @@ async def add_participant_to_course(course_id: int,
 @course_router.put("/courses/{course_id}/remove_participant",
                    summary="Add participant to course",
                    description="Add participant to course",
-                   response_model=RetriveCourseResponseSchema)
-async def add_participant_to_course(course_id: int,
+                   response_model=RetriveCourseResponseSchema,
+                   dependencies=[Depends(PermisssionChecker([IsAuthenticated,
+                                                             IsTeacher]))]
+                   )
+async def remove_participant_from_course(course_id: int,
                                     current_user: User = Depends(get_current_user),
                                     ):
     return await CourseService.remove_participant_from_course(course_id=course_id, user=current_user)
@@ -74,7 +83,10 @@ async def update_course_info(course_id: int, course: CreateCourseRequestSchema,
 
 @course_router.delete("/courses/{course_id}",
                       summary="Delete course",
-                      description="Delete course")
+                      description="Delete course",
+                      dependencies=[Depends(PermisssionChecker([IsAuthenticated,
+                                                                IsTeacher]))]
+                      )
 async def delete_course(course_id: int,
                         current_user: User = Depends(get_current_user)):
     await CourseService.delete_course(course_id=course_id,  user=current_user)
