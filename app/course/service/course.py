@@ -129,8 +129,8 @@ class CourseService:
 
     @classmethod
     async def get_new_courses(cls, days):
-        start_date = datetime.utcnow() - datetime.timedelta(days=days)
-        end_date = datetime.utcnow()
+        start_date = datetime.datetime.utcnow() - datetime.timedelta(days=days)
+        end_date = datetime.datetime.utcnow()
 
         stmt = select(Course).where(
             and_(
@@ -144,8 +144,8 @@ class CourseService:
 
     @classmethod
     async def get_updated_courses(cls, days):
-        start_date = datetime.utcnow() - datetime.timedelta(days=days)
-        end_date = datetime.utcnow()
+        start_date = datetime.datetime.utcnow() - datetime.timedelta(days=days)
+        end_date = datetime.datetime.utcnow()
 
         stmt = select(Course).where(
             and_(
