@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends
+from fastapi_cache.coder import PickleCoder
+from fastapi_cache.decorator import cache
 
 from api.users.users import get_current_user
 from app.course.schemas.section import *
@@ -21,6 +23,7 @@ async def create_course_section(course_id: int,
 @course_secion_router.get("/courses/{course_id}/section/{cid}",
                           summary="get course section",
                           description="Get a course section")
+@cache(namespace="section", expire=300, coder=PickleCoder)
 async def get_course_section(course_id: int, cid: int):
     return await CourseSectionService.get_course_section_by_id(course_section_id=cid)
 
@@ -29,6 +32,7 @@ async def get_course_section(course_id: int, cid: int):
                           summary="get course sections",
                           description="Get all course sections",
                           response_model=List[CreateCourseSectionResposeSchema])
+@cache(namespace="section", expire=300, coder=PickleCoder)
 async def get_course_sections(course_id: int):
     return await CourseSectionService.get_course_sections_by_course_id(course_id=course_id)
 

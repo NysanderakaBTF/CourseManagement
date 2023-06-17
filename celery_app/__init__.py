@@ -15,10 +15,10 @@ celery_app.conf.update(task_track_started=True)
 celery_app.conf.beat_schedule = {
     'run-every-30-minutes': {
         'task': 'send_new_courses',
-        'schedule': crontab(minute='*/1'),
+        'schedule':  crontab(day_of_week='sun', hour='0', minute='0'),
     },
     'run-every-10-minutes': {
         'task': 'send_updated_courses',
-        'schedule': crontab(minute='*/1'),
+        'schedule':  crontab(day_of_week='sun', hour='0', minute='0'),
     },
 }

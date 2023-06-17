@@ -2,6 +2,8 @@ from typing import Annotated, List
 
 from fastapi import APIRouter, Body, Depends
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi_cache.coder import PickleCoder
+from fastapi_cache.decorator import cache
 
 from app.course.schemas.course import RetriveCourseListResponseSchema
 from app.users.models import User
@@ -16,6 +18,7 @@ user_router = APIRouter(tags=["user"])
 @user_router.get("/users/{user_id}",
                  response_model=RetriveUserResponseSchema,
                  description="Get user by user id")
+@cache(namespace="users", expire=300, coder=PickleCoder)
 async def get_user(user_id: int,
                    ):
     return await UserService.get_user(user_id=user_id)

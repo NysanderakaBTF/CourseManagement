@@ -1,6 +1,8 @@
 from typing import List
 
 from fastapi import APIRouter
+from fastapi_cache.coder import PickleCoder
+from fastapi_cache.decorator import cache
 
 from app.course.schemas.block import CreateCompletedBlockResponseSchema, \
     CreateCourseBlockRequestSchema, \
@@ -16,6 +18,7 @@ block_router = APIRouter(prefix="/courses/{course_id}/section/{cid}",
 @block_router.get("/blocks",
                   response_model=List[RetriveCourseBlockResponseSchema],
                   description="Getting all course blocks for a section")
+@cache(namespace="block", expire=300, coder=PickleCoder)
 async def get_blocks(cid: int):
     return await CourseBlockService.get_course_blocks_by_section_id(cid)
 
@@ -30,6 +33,7 @@ async def create_block(cid: int, block: CreateCourseBlockRequestSchema):
 @block_router.get("/blocks/{bid}",
                   response_model=RetriveCourseBlockResponseSchema,
                   description="Getting a course block by id")
+@cache(namespace="block", expire=300, coder=PickleCoder)
 async def get_block(cid: int, bid: int):
     return await CourseBlockService.get_course_block_by_id(bid)
 

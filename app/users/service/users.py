@@ -20,7 +20,7 @@ class UserService:
                             offset: int = 0
                             ):
         async with provide_session() as session:
-            result = await session.execute(select(User).limit(limit).offset(offset).all())
+            result = await session.execute(select(User).limit(limit).offset(offset))
             await session.commit()
             return result.scalars().all()
 

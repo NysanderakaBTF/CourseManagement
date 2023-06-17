@@ -1,6 +1,8 @@
 from typing import List
 
 from fastapi import APIRouter, Query, Depends
+from fastapi_cache.coder import PickleCoder
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.course.models.course import Course
@@ -22,6 +24,7 @@ course_router = APIRouter(tags=["course"])
                    response_model=List[RetriveCourseListResponseSchema],
                    summary="Get all courses",
                    description="Get all courses")
+@cache(namespace="course", expire=300, coder=PickleCoder)
 async def get_all_courses(limit: int = Query(default=20),
                           offset: int = Query(default=0),
                           ):
@@ -32,6 +35,7 @@ async def get_all_courses(limit: int = Query(default=20),
                    summary="Get course by id",
                    description="Get course by id",
                    response_model=RetriveCourseResponseSchema)
+@cache(namespace="course", expire=300, coder=PickleCoder)
 async def get_course_by_id(course_id: int,
                            ):
     return await CourseService.get_course_by_id(course_id=course_id)
